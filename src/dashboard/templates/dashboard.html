@@ -1,0 +1,93 @@
+<html>
+
+<head>
+    <title>Video Streaming Demonstration</title>
+    <script src="./../static/scripts/chart.js"></script>
+    <script src="../static/scripts/jquery-3.6.0.min.js" crossorigin="anonymous"></script>
+    <link href="../static/styles/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+</head>
+
+<body>
+    <h1 style="text-align: center;">Home Security by AIC</h1>
+
+    <div style="display: flex; flex-wrap: wrap; flex-direction: row; justify-content: space-between; margin-bottom: 20px;">
+        <div class="card" style="width: 100%;">
+            <h5 style="text-align: center;">Your current home state</h5>
+            <div class="card-body">
+                <p style = "text-align: center" id="currentState"></p>
+            </div>
+        </div>
+    </div>
+
+    <div style="display: flex; flex-wrap: wrap; flex-direction: row; justify-content: space-between;">
+        <div class="card" style="width: 45%;">
+            <h5 style="text-align: center;">Live Video</h5>
+            <div class="card-body">
+                <img src="{{ url_for('video_feed') }}" style="max-width: 100%">
+            </div>
+        </div>
+
+        <div class="card" style="width: 45%;" id="chartParent">
+            <h5 style="text-align: center;">Live Energy Level</h5>
+            <div class="card-body">
+                <canvas id="lineChart"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        $(document).ready(function () {
+            const canvas = document.getElementById("lineChart");
+            const parent = document.getElementById("chartParent");
+            canvas.width = parent.offsetWidth*0.9;
+            canvas.height = parent.offsetHeight;
+
+            const config = {
+                type: "line",
+                data: {
+                    labels: {{ labels | safe }},
+                    datasets: [
+                        {
+                            label: "Data points",
+                            data: {{ values | safe }},
+                            fill: true,
+                            boderColor: "rgb(75, 192, 192)",
+                            lineTension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true
+                }
+            };
+
+            const ctx = document.getElementById("lineChart").getContext("2d");
+
+            const lineChart = new Chart(ctx, config)
+
+            const source_energy = new EventSource("/energy-feed");
+
+            source_energy.onmessage = function (event) {
+                const data = JSON.parse(event.data);
+                if (config.data.labels.length === 20) {
+                    config.data.labels.shift();
+                    config.data.datasets[0].data.shift();
+                }
+                config.data.labels.push(data.date);
+                config.data.datasets[0].data.push(data.value);
+                lineChart.update();
+            }
+
+
+            var s = document.getElementById('currentState');
+            const source_activation = new EventSource("/activation-feed");
+
+            source_activation.onmessage = function (event) {
+                const data = JSON.parse(event.data);
+                s.innerHTML = data.current_state;
+            }
+        });
+    </script>
+</body>
+
+</html>
