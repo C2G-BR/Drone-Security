@@ -14,6 +14,8 @@ The motion sensor notifies the Arduino board about any detected movements. The A
 1. [Description](#description)
     - [Dashboard](#dashboard)
     - [Architecture](#architecture)
+    - [Arduino](#arduino)
+    - [Demo](#demo)
 1. [Further Reading Material](#further-reading-material)
 
 
@@ -73,6 +75,11 @@ By default, the system considers that the owner is at home. Accordingly, the LED
 When the owner returns home, he can deactivate the security mode by pressing the button again. Movements are no longer detected.
 
 The communication with the server/dashboard is done via a serial interface, where only the client, i.e. the Arduino board, writes.
+
+### Demo video
+Please take it with a sense of humor!!!
+
+[![Demo video](https://img.youtube.com/vi/2tt0-oihb0E/0.jpg)](https://www.youtube.com/watch?v=2tt0-oihb0E)
 
 ## Further Reading Material
 - [🇬🇧 Presentation of the project](docs/aic_security_presentation_english.pdf)
